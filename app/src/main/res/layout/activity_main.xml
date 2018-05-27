@@ -3,12 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/shade"
     tools:context="com.bredeekmendes.popularmovies_stage2.MainActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_movies_main"
         android:layout_width="match_parent"
-        android:background="@color/shade"
         android:layout_height="match_parent"/>
 
     <TextView
@@ -16,8 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="Nothing to show"
-        android:background="@color/shade"
+        android:text="@string/nothing_to_show"
         android:textSize="20sp"
         android:textColor="@color/white"/>
 

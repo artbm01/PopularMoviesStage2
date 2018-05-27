@@ -33,6 +33,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <provider
+            android:name=".dbtools.MovieProvider"
+            android:authorities="com.movieproject"
+            android:exported="false" />
+
     </application>
 
 </manifest>

@@ -35,6 +35,7 @@ import android.widget.ToggleButton;
 import java.io.IOException;
 import java.util.List;
 
+import static com.bredeekmendes.popularmovies_stage2.dbtools.MovieContract.MovieDatabaseEntry.buildMovieUriWithId;
 import static com.bredeekmendes.popularmovies_stage2.utils.NetworkUtils.getJsonResponseFromUrlRequest;
 
 public class MovieDetailActivity extends AppCompatActivity implements LoaderCallbacks<String[]>{
@@ -339,10 +340,16 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderCall
         cv.put(MovieContract.MovieDatabaseEntry.COLUMN_RATING, myDetailedMovie.getRating());
         cv.put(MovieContract.MovieDatabaseEntry.COLUMN_RELEASE_DATE, myDetailedMovie.getReleaseDate());
         cv.put(MovieContract.MovieDatabaseEntry.COLUMN_SYNOPSIS, myDetailedMovie.getSynopsis());
-        movieDatabase.insert(MovieContract.MovieDatabaseEntry.TABLE_NAME, null, cv);
+        getContentResolver().insert(MovieContract.MovieDatabaseEntry.CONTENT_URI, cv);
     }
 
     private void removeMovieFromFavorite(){
-        movieDatabase.delete(MovieContract.MovieDatabaseEntry.TABLE_NAME, MovieContract.MovieDatabaseEntry.COLUMN_MOVIE_ID+ "=" +myDetailedMovie.getId(), null);
+        String id = myDetailedMovie.getId();
+        Uri uri = buildMovieUriWithId(id);
+        getContentResolver().delete(
+                uri,
+                null,
+                null
+                );
     }
 }

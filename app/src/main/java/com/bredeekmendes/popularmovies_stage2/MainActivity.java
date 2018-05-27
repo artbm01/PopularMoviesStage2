@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bredeekmendes.popularmovies_stage2.dbtools.MovieContract;
-import com.bredeekmendes.popularmovies_stage2.dbtools.MovieDbHelper;
 import com.bredeekmendes.popularmovies_stage2.model.Movie;
 import com.bredeekmendes.popularmovies_stage2.utils.NetworkUtils;
 
@@ -46,8 +45,15 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private String PARCELABLE_KEY;
     private ProgressBar mProgressBar;
     private NetworkReceiver receiver = new NetworkReceiver();
-    private SQLiteDatabase movieDatabase;
     private TextView mEmptyView;
+    private static final String[] MAIN_MOVIE_PROJECTION = {
+            MovieContract.MovieDatabaseEntry.COLUMN_TITLE,
+            MovieContract.MovieDatabaseEntry.COLUMN_SYNOPSIS,
+            MovieContract.MovieDatabaseEntry.COLUMN_RATING,
+            MovieContract.MovieDatabaseEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieDatabaseEntry.COLUMN_IMAGE_URL,
+            MovieContract.MovieDatabaseEntry.COLUMN_MOVIE_ID
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         mProgressBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mEmptyView = (TextView) findViewById(R.id.empty_tv);
         setActivityCustomTitle();
-        MovieDbHelper helper = new MovieDbHelper(this);
-        movieDatabase = helper.getWritableDatabase();
         PARCELABLE_KEY = this.getResources().getString(R.string.parcelable_key);
         if (receiver!=null){
             populateUI();
@@ -146,8 +150,13 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     @Override
     public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
-        mMovieAdapter.setMovieData(data);
-        callRecyclerView();
+        if (data==null){
+            callEmptyView();
+        }
+        else{
+            mMovieAdapter.setMovieData(data);
+            callRecyclerView();
+        }
     }
 
     @Override
@@ -209,21 +218,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
      * If the view is empty a Toast message is shown
      */
     private void callRecyclerView() {
-        final String sortByKey = MainActivity.this.getString(R.string.pref_sortby_key);
-        final String defaultSortBy = MainActivity.this.getString(R.string.pref_sortby_popularity);
-        final String favoriteSortBy = MainActivity.this.getString(R.string.pref_sortby_favorite);
-        final String sortByPreference = sp.getString(sortByKey, defaultSortBy);
-        if (sortByPreference.equals(favoriteSortBy)){
-            mEmptyView.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.INVISIBLE);
-            mRecyclerView.setVisibility(View.INVISIBLE);
-        }
-        else{
-            mProgressBar.setVisibility(View.INVISIBLE);
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mRecyclerView.scrollToPosition(0);
-            mEmptyView.setVisibility(View.INVISIBLE);
-        }
+        mProgressBar.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mRecyclerView.scrollToPosition(0);
+        mEmptyView.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -274,34 +272,46 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
      * loader and the adapter
      */
     private List<Movie> readFavoriteFromDatabase() {
+
+        Uri movieQueryUri = MovieContract.MovieDatabaseEntry.CONTENT_URI;
+        String sortOrder = MovieContract.MovieDatabaseEntry.COLUMN_TITLE + " ASC";
         List<Movie> movieList = new ArrayList<>();
-        Cursor cursor = movieDatabase.query(
-                MovieContract.MovieDatabaseEntry.TABLE_NAME,
+        Cursor cursor = getContentResolver().query(
+                movieQueryUri,
+                MAIN_MOVIE_PROJECTION,
                 null,
                 null,
-                null,
-                null,
-                null,
-                MovieContract.MovieDatabaseEntry.COLUMN_MOVIE_ID);
-        cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
-            String title = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_TITLE));
-            String synopsis = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_SYNOPSIS));
-            String rating = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_RATING));
-            String releaseDate = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_RELEASE_DATE));
-            String poster_image = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_IMAGE_URL));
-            String id = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_MOVIE_ID));
-            Movie movie = new Movie();
-            movie.setTitle(title);
-            movie.setSynopsis(synopsis);
-            movie.setRating(rating);
-            movie.setReleaseDate(releaseDate);
-            movie.setImage(poster_image);
-            movie.setId(id);
-            movieList.add(movie);
-            cursor.moveToNext();
+                sortOrder
+        );
+        if (cursor.moveToFirst()){
+            while(!cursor.isAfterLast()){
+                String title = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_TITLE));
+                String synopsis = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_SYNOPSIS));
+                String rating = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_RATING));
+                String releaseDate = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_RELEASE_DATE));
+                String poster_image = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_IMAGE_URL));
+                String id = cursor.getString(cursor.getColumnIndex(MovieContract.MovieDatabaseEntry.COLUMN_MOVIE_ID));
+                Movie movie = new Movie();
+                movie.setTitle(title);
+                movie.setSynopsis(synopsis);
+                movie.setRating(rating);
+                movie.setReleaseDate(releaseDate);
+                movie.setImage(poster_image);
+                movie.setId(id);
+                movieList.add(movie);
+                cursor.moveToNext();
+            }
+            cursor.close();
+            return movieList;
         }
-        cursor.close();
-        return movieList;
+        else{
+            return null;
+        }
+    }
+
+    private void callEmptyView(){
+        mEmptyView.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
     }
 }

@@ -9,13 +9,13 @@ import android.provider.BaseColumns;
 
 public class MovieContract {
 
-    private static final String CONTENT_AUTHORITY = "com.movieproject";
-    private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
-    private static final String PATH_MOVIE = "movie";
+    public static final String CONTENT_AUTHORITY = "com.movieproject";
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    public static final String PATH_MOVIE = "movie";
 
     public static final class MovieDatabaseEntry implements BaseColumns {
 
-        static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_MOVIE)
                 .build();
 

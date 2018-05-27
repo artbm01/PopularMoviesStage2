@@ -25,7 +25,6 @@ public class NetworkUtils {
     private static final String IMAGE_SIZE = "w185";
     private static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
 
-
     /**
      * This method will generate the appropriate URL based on @param urlType used
      * @param context

@@ -13,7 +13,7 @@ import com.bredeekmendes.popularmovies_stage2.dbtools.MovieContract.*;
 public class MovieDbHelper extends SQLiteOpenHelper{
 
     private static final String DATABASE_NAME = "movie.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
 
     public MovieDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,13 +34,12 @@ public class MovieDbHelper extends SQLiteOpenHelper{
                 " UNIQUE (" + MovieDatabaseEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_ORCHID_DATABASE);
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieDatabaseEntry.TABLE_NAME);
-        onCreate(sqLiteDatabase);
+        //No upgrades so far
+        /*sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieDatabaseEntry.TABLE_NAME);
+        onCreate(sqLiteDatabase);*/
     }
-
 }
