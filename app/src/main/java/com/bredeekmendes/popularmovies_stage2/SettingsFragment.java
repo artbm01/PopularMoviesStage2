@@ -39,7 +39,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         for (int i = 0; i < count; i++) {
             Preference preference = prefScreen.getPreference(i);
             if (!(preference instanceof CheckBoxPreference)) {
-                String value = sharedPreferences.getString(preference.getKey(), "");
+                String value = sharedPreferences.getString(preference.getKey(), this.getString(R.string.pref_sortby_popularity));
                 setPreferenceSummary(preference, value);
             }
         }

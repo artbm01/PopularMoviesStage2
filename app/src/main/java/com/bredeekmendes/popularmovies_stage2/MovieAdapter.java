@@ -75,7 +75,4 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         notifyDataSetChanged();
     }
 
-    public Boolean isEmpty(){
-        return myMovieData.isEmpty();
-    }
 }

@@ -208,10 +208,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         mProgressBar.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
         mRecyclerView.scrollToPosition(0);
-        if (mMovieAdapter.isEmpty()){
-            Toast.makeText(MainActivity.this,"No favorite movies added!",Toast.LENGTH_LONG).show();
-        }
-
     }
 
     /**
@@ -225,13 +221,13 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         String prefKey = sp.getString(this.getString(R.string.pref_sortby_key),sortPopular);
         String title = null;
         if (prefKey.equals(sortPopular)) {
-            title = this.getResources().getString(R.string.pref_sortby_label_popularity);
+            title = this.getString(R.string.pref_sortby_label_popularity);
         }
         else if (prefKey.equals(sortRate)){
-            title = this.getResources().getString(R.string.pref_sortby_label_rate);
+            title = this.getString(R.string.pref_sortby_label_rate);
         }
         else if (prefKey.equals(sortFavorite)){
-            title = this.getResources().getString(R.string.pref_sortby_label_favorite);
+            title = this.getString(R.string.pref_sortby_label_favorite);
         }
         setTitle(title);
     }
