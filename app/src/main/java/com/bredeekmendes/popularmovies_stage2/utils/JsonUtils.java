@@ -11,7 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JsonUtils {
+public final class JsonUtils {
 
     private static final String TITLE = "title";
     private static final String POSTER = "poster_path";
@@ -24,6 +24,13 @@ public class JsonUtils {
     private static final String AUTHOR = "author";
     private static final String CONTENT = "content";
     private static final String ID = "id";
+
+    /**
+    *Locked away constructor. JsonUtils should not be instantiated.
+    */
+    private JsonUtils (){
+        throw new AssertionError("No JsonUtils instances should be instantiated!");
+    }
 
     /**
      * This method is responsible for parsing the JSON data and encapsulating it in the Movie object.
