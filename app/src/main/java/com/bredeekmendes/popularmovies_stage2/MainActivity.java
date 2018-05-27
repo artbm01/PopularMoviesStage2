@@ -22,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bredeekmendes.popularmovies_stage2.dbtools.MovieContract;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private ProgressBar mProgressBar;
     private NetworkReceiver receiver = new NetworkReceiver();
     private SQLiteDatabase movieDatabase;
+    private TextView mEmptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         this.registerReceiver(receiver, filter);
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies_main);
         mProgressBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mEmptyView = (TextView) findViewById(R.id.empty_tv);
         setActivityCustomTitle();
         MovieDbHelper helper = new MovieDbHelper(this);
         movieDatabase = helper.getWritableDatabase();
@@ -198,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private void callProgressBar(){
         mProgressBar.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
+        mEmptyView.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -205,9 +209,21 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
      * If the view is empty a Toast message is shown
      */
     private void callRecyclerView() {
-        mProgressBar.setVisibility(View.INVISIBLE);
-        mRecyclerView.setVisibility(View.VISIBLE);
-        mRecyclerView.scrollToPosition(0);
+        final String sortByKey = MainActivity.this.getString(R.string.pref_sortby_key);
+        final String defaultSortBy = MainActivity.this.getString(R.string.pref_sortby_popularity);
+        final String favoriteSortBy = MainActivity.this.getString(R.string.pref_sortby_favorite);
+        final String sortByPreference = sp.getString(sortByKey, defaultSortBy);
+        if (sortByPreference.equals(favoriteSortBy)){
+            mEmptyView.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mRecyclerView.setVisibility(View.INVISIBLE);
+        }
+        else{
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mRecyclerView.scrollToPosition(0);
+            mEmptyView.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**
