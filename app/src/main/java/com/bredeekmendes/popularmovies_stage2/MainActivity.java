@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         String sortPopular = this.getString(R.string.pref_sortby_popularity);
         String sortRate = this.getString(R.string.pref_sortby_rate);
         String sortFavorite = this.getString(R.string.pref_sortby_favorite);
-        String prefKey = sp.getString(this.getString(R.string.pref_sortby_key),null);
+        String prefKey = sp.getString(this.getString(R.string.pref_sortby_key),sortPopular);
         String title = null;
         if (prefKey.equals(sortPopular)) {
             title = this.getResources().getString(R.string.pref_sortby_label_popularity);
