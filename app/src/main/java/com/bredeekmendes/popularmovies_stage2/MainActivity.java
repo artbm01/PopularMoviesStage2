@@ -220,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private void callRecyclerView() {
         mProgressBar.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
-        mRecyclerView.scrollToPosition(0);
         mEmptyView.setVisibility(View.INVISIBLE);
     }
 
